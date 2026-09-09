@@ -657,9 +657,6 @@
                 <div class="brand-subtitle">Weekly Orchestration</div>
             </div>
             <div class="header-actions no-print">
-                <button class="btn-secondary" onclick="exportAppData()">Export Data</button>
-                <button class="btn-secondary" onclick="triggerImportDialog()">Import Data</button>
-                <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importAppData(event)">
                 <button class="btn-secondary" onclick="window.print()">Print Schedule</button>
                 <button class="btn-danger" onclick="clearWeeklyPlan()">Clear Weekly Plan</button>
             </div>
@@ -1003,6 +1000,10 @@
     </div>
 
     <script>
+        // --- CLOUD SYNC CONFIGURATION ---
+        const JSONBIN_BIN_ID = '$2a$10$OGrr5Tb.asXF8zhT0W.f7eoO/yPF4YRWWOkGfd4WtX9ZlpCjvthDq'; // Replace with your Bin ID from Step 1
+        const JSONBIN_API_KEY = '$2a$10$OGrr5Tb.asXF8zhT0W.f7eoO/yPF4YRWWOkGfd4WtX9ZlpCjvthDq';
+
         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const mealTimes = ['Breakfast', 'AM Snack', 'Lunch', 'PM Snack', 'Dinner'];
 
@@ -1050,7 +1051,7 @@
         let activeMealTasks = [];
         let tempModalFoodTypeTasks = [];
 
-        function init() {
+        async function init() {
             renderMealCategoriesList();
             renderPrepCategoriesDropdowns();
             renderPrepCategoriesTags();
@@ -1060,61 +1061,74 @@
             renderLibrary();
             renderPlanner();
             renderPrepSchedule();
+
+            // Load latest data from JSONBin if Bin ID is set
+            if (JSONBIN_BIN_ID && JSONBIN_BIN_ID !== 'YOUR_BIN_ID_HERE') {
+                await loadFromCloud();
+            }
         }
 
-        function saveData() {
+        async function saveData() {
+            // Save locally first
             localStorage.setItem('mp_categories', JSON.stringify(categories));
             localStorage.setItem('mp_prepCategories', JSON.stringify(prepCategories));
             localStorage.setItem('mp_foodTypes', JSON.stringify(foodTypes));
             localStorage.setItem('mp_meals', JSON.stringify(meals));
             localStorage.setItem('mp_weeklyPlan', JSON.stringify(weeklyPlan));
             renderPrepSchedule();
-        }
 
-        // --- Export / Import ---
-        function exportAppData() {
-            const dataPackage = {
-                categories,
-                prepCategories,
-                foodTypes,
-                meals,
-                weeklyPlan
-            };
-            const jsonString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataPackage, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", jsonString);
-            downloadAnchor.setAttribute("download", "meal_planner_backup.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function triggerImportDialog() {
-            document.getElementById('importFileInput').click();
-        }
-
-        function importAppData(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
+            // Sync to JSONBin
+            if (JSONBIN_BIN_ID && JSONBIN_BIN_ID !== 'YOUR_BIN_ID_HERE') {
+                const payload = { categories, prepCategories, foodTypes, meals, weeklyPlan };
                 try {
-                    const imported = JSON.parse(evt.target.result);
-                    if (imported.categories) categories = imported.categories;
-                    if (imported.prepCategories) prepCategories = imported.prepCategories;
-                    if (imported.foodTypes) foodTypes = imported.foodTypes;
-                    if (imported.meals) meals = imported.meals;
-                    if (imported.weeklyPlan) weeklyPlan = imported.weeklyPlan;
-
-                    saveData();
-                    init();
-                    alert("Data imported successfully!");
+                    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': JSONBIN_API_KEY
+                        },
+                        body: JSON.stringify(payload)
+                    });
                 } catch (err) {
-                    alert("Failed to import data file. Please ensure it is a valid JSON backup.");
+                    console.error("Cloud sync failed:", err);
                 }
-            };
-            reader.readAsText(file);
+            }
+        }
+
+        async function loadFromCloud() {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                    headers: { 'X-Master-Key': JSONBIN_API_KEY }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                const record = data.record;
+
+                if (record.categories) categories = record.categories;
+                if (record.prepCategories) prepCategories = record.prepCategories;
+                if (record.foodTypes) foodTypes = record.foodTypes;
+                if (record.meals) meals = record.meals;
+                if (record.weeklyPlan) weeklyPlan = record.weeklyPlan;
+
+                // Save locally and refresh UI
+                localStorage.setItem('mp_categories', JSON.stringify(categories));
+                localStorage.setItem('mp_prepCategories', JSON.stringify(prepCategories));
+                localStorage.setItem('mp_foodTypes', JSON.stringify(foodTypes));
+                localStorage.setItem('mp_meals', JSON.stringify(meals));
+                localStorage.setItem('mp_weeklyPlan', JSON.stringify(weeklyPlan));
+
+                renderMealCategoriesList();
+                renderPrepCategoriesDropdowns();
+                renderPrepCategoriesTags();
+                renderFoodTypesList();
+                renderCategoryFilter();
+                renderFoodTypeFilter();
+                renderLibrary();
+                renderPlanner();
+                renderPrepSchedule();
+            } catch (err) {
+                console.error("Cloud load failed:", err);
+            }
         }
 
         // --- Navigation ---
