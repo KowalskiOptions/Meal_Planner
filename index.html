@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Planner & Prep Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8f6f0;
+            --card-bg: #ffffff;
+            --text-primary: #1c1917;
+            --text-secondary: #78716c;
+            --primary-color: #2a2825;
+            --primary-hover: #121110;
+            --accent-gold: #c5a880;
+            --accent-gold-light: #f5f0e8;
+            --border-color: #e7e5e4;
+            --border-hover: #d6d3d1;
+            --danger-color: #9f1239;
+            --danger-hover: #881337;
+            --food-tag-bg: #f5f0e8;
+            --food-tag-text: #8c6d3f;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-subtle: 0 4px 20px -2px rgba(28, 25, 23, 0.05);
+            --shadow-modal: 0 20px 25px -5px rgba(28, 25, 23, 0.1), 0 8px 10px -6px rgba(28, 25, 23, 0.1);
+            --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 32px 20px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1320px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            background: var(--card-bg);
+            padding: 24px 32px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-subtle);
+            border: 1px solid var(--border-color);
+        }
+
+        .brand-title {
+            font-family: var(--font-serif);
+            font-size: 2.1rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--primary-color);
+        }
+
+        .brand-subtitle {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-gold);
+            font-weight: 600;
+            margin-top: -2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: 1px solid var(--primary-color);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85rem;
+            font-family: var(--font-sans);
+            letter-spacing: 0.03em;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        button.btn-danger {
+            background-color: transparent;
+            color: var(--danger-color);
+            border-color: #fecdd3;
+        }
+
+        button.btn-danger:hover {
+            background-color: #fff1f2;
+            border-color: var(--danger-color);
+        }
+
+        button.btn-secondary {
+            background-color: #ffffff;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        button.btn-secondary:hover {
+            background-color: var(--bg-color);
+            border-color: var(--border-hover);
+        }
+
+        /* Nav Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2px;
+        }
+
+        .nav-tab {
+            padding: 10px 4px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-weight: 500;
+            box-shadow: none;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tab:hover {
+            color: var(--primary-color);
+            background: transparent;
+        }
+
+        .nav-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--accent-gold);
+            font-weight: 600;
+            background: transparent;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 28px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-subtle);
+            border: 1px solid var(--border-color);
+            margin-bottom: 28px;
+        }
+
+        h2 {
+            font-family: var(--font-serif);
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            letter-spacing: -0.01em;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-row > * {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            background-color: #faf9f6;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(197, 168, 128, 0.15);
+        }
+
+        .library-controls {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            align-items: flex-end;
+        }
+
+        .library-controls .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: #faf9f6;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        /* Planner Grid Table */
+        .planner-table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .planner-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+        }
+
+        .planner-table th, .planner-table td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            vertical-align: top;
+            width: 14.28%;
+        }
+
+        .planner-table th {
+            background-color: #faf9f6;
+            color: var(--text-primary);
+            font-family: var(--font-serif);
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 12px;
+        }
+
+        .meal-slot {
+            min-height: 65px;
+            margin-bottom: 6px;
+            background: #ffffff;
+            border: 1px dashed #d6d3d1;
+            border-radius: var(--radius-sm);
+            padding: 6px 8px;
+            transition: border-color 0.2s ease;
+        }
+
+        .meal-slot:hover {
+            border-color: var(--accent-gold);
+        }
+
+        .slot-header {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 2px;
+        }
+
+        .slot-content {
+            font-size: 0.85rem;
+            outline: none;
+            color: var(--text-primary);
+        }
+
+        .slot-content:focus {
+            background-color: var(--accent-gold-light);
+            border-radius: 2px;
+        }
+
+        .assign-select {
+            width: 100%;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            padding: 4px;
+            background: #faf9f6;
+        }
+
+        /* Library Cards Display */
+        .meal-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .meal-card-item {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.25s ease;
+        }
+
+        .meal-card-item:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -4px rgba(28, 25, 23, 0.08);
+        }
+
+        .meal-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .meal-card-title {
+            font-family: var(--font-serif);
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .meal-card-title:hover {
+            color: var(--accent-gold);
+        }
+
+        .meal-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 8px 0 12px 0;
+        }
+
+        .meal-tag {
+            background: #faf9f6;
+            color: var(--text-secondary);
+            font-size: 0.725rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            font-weight: 500;
+        }
+
+        .food-type-tag {
+            background: var(--food-tag-bg);
+            color: var(--food-tag-text);
+            font-size: 0.725rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .quick-add-box {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-color);
+            background: #faf9f6;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+        }
+
+        .quick-add-title {
+            font-size: 0.685rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .quick-add-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .quick-add-controls select {
+            font-size: 0.75rem;
+            padding: 6px;
+        }
+
+        .quick-add-controls button {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        /* Prep Schedule Grid */
+        .prep-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 1200px) {
+            .prep-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .prep-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .prep-day-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: #ffffff;
+            overflow: hidden;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .prep-day-header {
+            background: var(--primary-color);
+            color: #ffffff;
+            font-family: var(--font-serif);
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+            font-size: 1.1rem;
+            letter-spacing: 0.02em;
+        }
+
+        .prep-time-section {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .prep-time-section:last-child {
+            border-bottom: none;
+        }
+
+        .prep-time-title {
+            font-size: 0.685rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+        }
+
+        .prep-task-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .prep-task-item {
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            background: #faf9f6;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .task-builder-item {
+            background: #faf9f6;
+            border: 1px solid var(--border-color);
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .tag-item {
+            background: #faf9f6;
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tag-actions button {
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            margin-left: 4px;
+        }
+
+        /* Modal Overlay for Edits */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(28, 25, 23, 0.4);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            width: 500px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-modal);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Print Specific Styles */
+        @media print {
+            body {
+                background-color: #fff;
+                color: #000;
+                padding: 0;
+            }
+
+            .no-print, header button, .nav-tabs, .assign-select, button {
+                display: none !important;
+            }
+
+            .tab-content {
+                display: none !important;
+            }
+
+            #plannerTab {
+                display: block !important;
+            }
+
+            .card {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                margin-bottom: 20px;
+            }
+
+            .planner-table th, .planner-table td {
+                border: 1px solid #000;
+            }
+
+            .planner-table th {
+                background-color: #eee !important;
+                color: #000;
+            }
+
+            .meal-slot {
+                border: none;
+                min-height: auto;
+                padding: 2px;
+            }
+
+            .prep-grid {
+                grid-template-columns: repeat(7, 1fr) !important;
+                gap: 4px;
+            }
+
+            .prep-day-card {
+                border: 1px solid #000;
+            }
+
+            .prep-day-header {
+                background: #eee !important;
+                color: #000;
+                border-bottom: 1px solid #000;
+            }
+
+            .prep-time-section {
+                border-bottom: 1px solid #ccc;
+            }
+
+            .slot-header, .prep-time-title {
+                color: #000;
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div>
+                <div class="brand-title">Culinary Planning & Prep</div>
+                <div class="brand-subtitle">Weekly Orchestration</div>
+            </div>
+            <div class="header-actions no-print">
+                <button class="btn-secondary" onclick="exportAppData()">Export Data</button>
+                <button class="btn-secondary" onclick="triggerImportDialog()">Import Data</button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importAppData(event)">
+                <button class="btn-secondary" onclick="window.print()">Print Schedule</button>
+                <button class="btn-danger" onclick="clearWeeklyPlan()">Clear Weekly Plan</button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs no-print">
+            <button class="nav-tab active" onclick="switchTab('plannerTab', this)">Weekly Planner & Prep</button>
+            <button class="nav-tab" onclick="switchTab('libraryTab', this)">Meal Library</button>
+            <button class="nav-tab" id="detailTabBtn" style="display:none;" onclick="switchTab('detailTab', this)">Meal Details & Edit</button>
+            <button class="nav-tab" onclick="switchTab('categoriesTab', this)">Manage Categories</button>
+        </div>
+
+        <!-- TAB 1: WEEKLY PLANNER & PREP -->
+        <div id="plannerTab" class="tab-content active">
+            <div class="card">
+                <h2>Weekly Meal Plan</h2>
+                <div class="planner-table-wrapper">
+                    <table class="planner-table">
+                        <thead>
+                            <tr>
+                                <th>Mon</th>
+                                <th>Tue</th>
+                                <th>Wed</th>
+                                <th>Thu</th>
+                                <th>Fri</th>
+                                <th>Sat</th>
+                                <th>Sun</th>
+                            </tr>
+                        </thead>
+                        <tbody id="plannerGrid"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Weekly Prep Schedule</h2>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+                    Tasks automatically positioned before scheduled meals based on configured lead times.
+                </p>
+                <div class="prep-grid" id="prepGridContainer"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2: MEAL LIBRARY -->
+        <div id="libraryTab" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Meal Library</h2>
+                    <button onclick="createNewMeal()">+ Add New Meal</button>
+                </div>
+                
+                <div class="library-controls">
+                    <div class="filter-group">
+                        <label for="mealSearchInput">Search Meals</label>
+                        <input type="text" id="mealSearchInput" oninput="renderLibrary()" placeholder="Search by name, category, food type...">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="categoryFilter">Meal Category</label>
+                        <select id="categoryFilter" onchange="renderLibrary()">
+                            <option value="ALL">All Meal Categories</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="foodTypeFilter">Food Type</label>
+                        <select id="foodTypeFilter" onchange="renderLibrary()">
+                            <option value="ALL">All Food Types</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="meal-cards-grid" id="libraryGrid"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: MEAL DETAILS & EDIT -->
+        <div id="detailTab" class="tab-content">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                <div class="card">
+                    <h2 id="mealDetailTitle">Edit Meal</h2>
+                    <form id="mealEditForm" onsubmit="saveMealDetails(event)">
+                        <input type="hidden" id="editMealId">
+
+                        <div class="form-group">
+                            <label for="editMealName">Meal Name</label>
+                            <input type="text" id="editMealName" required placeholder="e.g., Chhole">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editMealFoodType">Food Type</label>
+                            <select id="editMealFoodType" onchange="handleFoodTypeChangeInMeal()"></select>
+                            <small style="color: var(--text-secondary); font-size: 0.775rem;">Selecting a food type updates the prep tasks below with its default tasks.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Assign Meal Categories</label>
+                            <div class="checkbox-group" id="editCategoryCheckboxes"></div>
+                        </div>
+
+                        <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 18px; margin-top: 18px;">
+                            <label><strong>Configure Prep Tasks for this Meal</strong></label>
+                            <div class="form-row" style="margin-top: 8px;">
+                                <div style="flex:1;">
+                                    <label for="prepTaskCat">Category</label>
+                                    <select id="prepTaskCat" onchange="applyPrepCategoryDefaults('prepTaskCat', 'prepTaskOffset', 'prepTaskTime')"></select>
+                                </div>
+                                <div style="flex:2;">
+                                    <label for="prepTaskDesc">Task Details (Optional)</label>
+                                    <input type="text" id="prepTaskDesc" placeholder="e.g., Soak chickpeas in water">
+                                </div>
+                            </div>
+                            <div class="form-row" style="margin-top: 8px;">
+                                <div>
+                                    <label for="prepTaskOffset">When?</label>
+                                    <select id="prepTaskOffset">
+                                        <option value="0">Same Day</option>
+                                        <option value="1">1 Day Before</option>
+                                        <option value="2">2 Days Before</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="prepTaskTime">Time Slot</label>
+                                    <select id="prepTaskTime">
+                                        <option value="Morning">Morning</option>
+                                        <option value="Afternoon">Afternoon</option>
+                                        <option value="Night">Night</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-secondary" onclick="addPrepTaskToCurrentMeal()" style="width: 100%; margin-top: 12px;">+ Add Prep Task</button>
+                        </div>
+
+                        <div id="editTempTaskList" style="margin-bottom: 18px;"></div>
+
+                        <div style="display: flex; gap: 12px;">
+                            <button type="submit" style="flex: 1;">Save Meal Changes</button>
+                            <button type="button" class="btn-danger" onclick="deleteCurrentMeal()">Delete Meal</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Add to Weekly Plan</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Assign this recipe to a slot in your weekly planner:</p>
+                    
+                    <div class="form-group">
+                        <label for="assignDaySelect">Select Day</label>
+                        <select id="assignDaySelect">
+                            <option value="Mon">Monday</option>
+                            <option value="Tue">Tuesday</option>
+                            <option value="Wed">Wednesday</option>
+                            <option value="Thu">Thursday</option>
+                            <option value="Fri">Friday</option>
+                            <option value="Sat">Saturday</option>
+                            <option value="Sun">Sunday</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="assignTimeSelect">Select Meal Slot</label>
+                        <select id="assignTimeSelect">
+                            <option value="Breakfast">Breakfast</option>
+                            <option value="AM Snack">AM Snack</option>
+                            <option value="Lunch">Lunch</option>
+                            <option value="PM Snack">PM Snack</option>
+                            <option value="Dinner">Dinner</option>
+                        </select>
+                    </div>
+
+                    <button onclick="scheduleCurrentMealToPlanner()" style="width: 100%;">Add to Weekly Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: MANAGE CATEGORIES -->
+        <div id="categoriesTab" class="tab-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+                
+                <div class="card">
+                    <h2>Manage Food Types</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+                        Define food types (e.g., Kathor) and configure default prep tasks that automatically attach to meals of this type.
+                    </p>
+                    <form id="foodTypeForm" onsubmit="addFoodType(event)">
+                        <div class="form-group">
+                            <input type="text" id="foodTypeName" placeholder="e.g., Kathor, Curry, Salad" required>
+                        </div>
+                        <button type="submit" style="width: 100%;">Add Food Type</button>
+                    </form>
+                    <div class="tag-list" id="foodTypeList"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Meal Categories</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+                        Define recipe tags (e.g., Kid-Friendly, Dinners) to filter meals in your library.
+                    </p>
+                    <form id="categoryForm" onsubmit="addCategory(event)">
+                        <div class="form-group">
+                            <input type="text" id="categoryName" placeholder="e.g., Kid-Friendly, Quick Prep" required>
+                        </div>
+                        <button type="submit" style="width: 100%;">Add Meal Category</button>
+                    </form>
+                    <div class="tag-list" id="mealCategoryList"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Prep Task Categories</h2>
+                    <form id="prepCatForm" onsubmit="addPrepCategory(event)">
+                        <div class="form-group">
+                            <input type="text" id="prepCatName" placeholder="e.g., Chop, Soak, Marinate" required>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label for="prepCatDefaultOffset">Default Lead</label>
+                                <select id="prepCatDefaultOffset">
+                                    <option value="0">Same Day</option>
+                                    <option value="1" selected>1 Day Before</option>
+                                    <option value="2">2 Days Before</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="prepCatDefaultTime">Default Time</label>
+                                <select id="prepCatDefaultTime">
+                                    <option value="Morning">Morning</option>
+                                    <option value="Afternoon">Afternoon</option>
+                                    <option value="Night" selected>Night</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" style="width: 100%; margin-top: 12px;">Add Prep Category</button>
+                    </form>
+                    <div class="tag-list" id="prepCategoryList"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Modal for Editing Food Types -->
+        <div class="modal" id="editFoodTypeModal">
+            <div class="modal-content">
+                <h2>Edit Food Type</h2>
+                <input type="hidden" id="editFoodTypeOrigName">
+                
+                <div class="form-group" style="margin-top: 16px;">
+                    <label>Food Type Name</label>
+                    <input type="text" id="editFoodTypeName">
+                </div>
+
+                <div class="form-group" style="border-top:1px solid var(--border-color); padding-top:16px;">
+                    <label><strong>Configure Default Prep Tasks</strong></label>
+                    <div class="form-row" style="margin-top: 8px;">
+                        <div style="flex:1;">
+                            <label>Category</label>
+                            <select id="modalFoodTypePrepCat" onchange="applyPrepCategoryDefaults('modalFoodTypePrepCat', 'modalFoodTypePrepOffset', 'modalFoodTypePrepTime')"></select>
+                        </div>
+                        <div style="flex:2;">
+                            <label>Task Details (Optional)</label>
+                            <input type="text" id="modalFoodTypePrepDesc" placeholder="e.g., Soak legumes overnight">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-top: 8px;">
+                        <div>
+                            <label>When?</label>
+                            <select id="modalFoodTypePrepOffset">
+                                <option value="0">Same Day</option>
+                                <option value="1">1 Day Before</option>
+                                <option value="2">2 Days Before</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Time Slot</label>
+                            <select id="modalFoodTypePrepTime">
+                                <option value="Morning">Morning</option>
+                                <option value="Afternoon">Afternoon</option>
+                                <option value="Night">Night</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="addPrepTaskToFoodTypeModal()" style="width: 100%; margin-top: 10px;">+ Add Default Task</button>
+                </div>
+
+                <div id="modalFoodTypeTaskList" style="margin-bottom:18px;"></div>
+
+                <div style="display:flex; gap:10px;">
+                    <button type="button" onclick="saveFoodTypeEdit()" style="flex:1;">Save Food Type</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('editFoodTypeModal')">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Editing Meal Categories -->
+        <div class="modal" id="editMealCatModal">
+            <div class="modal-content">
+                <h2>Edit Meal Category</h2>
+                <input type="hidden" id="editMealCatOldName">
+                <div class="form-group" style="margin-top: 16px;">
+                    <label>Category Name</label>
+                    <input type="text" id="editMealCatNewName">
+                </div>
+                <div style="display:flex; gap:10px; margin-top:18px;">
+                    <button type="button" onclick="saveMealCategoryEdit()" style="flex:1;">Save</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('editMealCatModal')">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Editing Prep Action Categories -->
+        <div class="modal" id="editPrepCatModal">
+            <div class="modal-content">
+                <h2>Edit Prep Task Category</h2>
+                <input type="hidden" id="editPrepCatOriginalName">
+                <div class="form-group" style="margin-top: 16px;">
+                    <label>Category Name</label>
+                    <input type="text" id="editPrepCatName">
+                </div>
+                <div class="form-group">
+                    <label>Default Lead Time</label>
+                    <select id="editPrepCatOffset">
+                        <option value="0">Same Day</option>
+                        <option value="1">1 Day Before</option>
+                        <option value="2">2 Days Before</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Default Time Slot</label>
+                    <select id="editPrepCatTime">
+                        <option value="Morning">Morning</option>
+                        <option value="Afternoon">Afternoon</option>
+                        <option value="Night">Night</option>
+                    </select>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:18px;">
+                    <button type="button" onclick="savePrepCategoryEdit()" style="flex:1;">Save</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('editPrepCatModal')">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const mealTimes = ['Breakfast', 'AM Snack', 'Lunch', 'PM Snack', 'Dinner'];
+
+        // Storage Data
+        let categories = JSON.parse(localStorage.getItem('mp_categories')) || ['Breakfasts', 'Lunches', 'Dinners', 'Snacks', 'Kid-Friendly'];
+        
+        let prepCategories = JSON.parse(localStorage.getItem('mp_prepCategories')) || [
+            { name: 'Soak', defaultOffset: 1, defaultTime: 'Night' },
+            { name: 'Chop', defaultOffset: 0, defaultTime: 'Morning' },
+            { name: 'Marinate', defaultOffset: 1, defaultTime: 'Night' },
+            { name: 'Thaw', defaultOffset: 1, defaultTime: 'Morning' }
+        ];
+
+        let foodTypes = JSON.parse(localStorage.getItem('mp_foodTypes')) || [
+            {
+                name: 'Kathor',
+                defaultTasks: [
+                    { category: 'Soak', desc: 'Soak legumes in water', offsetDays: 1, timeOfDay: 'Night' }
+                ]
+            },
+            {
+                name: 'Curry',
+                defaultTasks: [
+                    { category: 'Chop', desc: 'Chop onions and tomatoes', offsetDays: 0, timeOfDay: 'Morning' }
+                ]
+            }
+        ];
+
+        let meals = JSON.parse(localStorage.getItem('mp_meals')) || [
+            {
+                id: 1,
+                name: 'Chhole',
+                foodType: 'Kathor',
+                categories: ['Dinners'],
+                tasks: [
+                    { category: 'Soak', desc: 'Soak chickpeas in water', offsetDays: 1, timeOfDay: 'Night' },
+                    { category: 'Chop', desc: 'Dice onions and ginger paste', offsetDays: 0, timeOfDay: 'Morning' }
+                ]
+            }
+        ];
+        
+        let weeklyPlan = JSON.parse(localStorage.getItem('mp_weeklyPlan')) || {};
+
+        let activeMealId = null;
+        let activeMealTasks = [];
+        let tempModalFoodTypeTasks = [];
+
+        function init() {
+            renderMealCategoriesList();
+            renderPrepCategoriesDropdowns();
+            renderPrepCategoriesTags();
+            renderFoodTypesList();
+            renderCategoryFilter();
+            renderFoodTypeFilter();
+            renderLibrary();
+            renderPlanner();
+            renderPrepSchedule();
+        }
+
+        function saveData() {
+            localStorage.setItem('mp_categories', JSON.stringify(categories));
+            localStorage.setItem('mp_prepCategories', JSON.stringify(prepCategories));
+            localStorage.setItem('mp_foodTypes', JSON.stringify(foodTypes));
+            localStorage.setItem('mp_meals', JSON.stringify(meals));
+            localStorage.setItem('mp_weeklyPlan', JSON.stringify(weeklyPlan));
+            renderPrepSchedule();
+        }
+
+        // --- Export / Import ---
+        function exportAppData() {
+            const dataPackage = {
+                categories,
+                prepCategories,
+                foodTypes,
+                meals,
+                weeklyPlan
+            };
+            const jsonString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataPackage, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", jsonString);
+            downloadAnchor.setAttribute("download", "meal_planner_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function triggerImportDialog() {
+            document.getElementById('importFileInput').click();
+        }
+
+        function importAppData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const imported = JSON.parse(evt.target.result);
+                    if (imported.categories) categories = imported.categories;
+                    if (imported.prepCategories) prepCategories = imported.prepCategories;
+                    if (imported.foodTypes) foodTypes = imported.foodTypes;
+                    if (imported.meals) meals = imported.meals;
+                    if (imported.weeklyPlan) weeklyPlan = imported.weeklyPlan;
+
+                    saveData();
+                    init();
+                    alert("Data imported successfully!");
+                } catch (err) {
+                    alert("Failed to import data file. Please ensure it is a valid JSON backup.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- Navigation ---
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            if (btnElement) btnElement.classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // --- Food Types Management ---
+        function addFoodType(e) {
+            e.preventDefault();
+            const name = document.getElementById('foodTypeName').value.trim();
+            if (name && !foodTypes.some(f => f.name.toLowerCase() === name.toLowerCase())) {
+                foodTypes.push({ name, defaultTasks: [] });
+                document.getElementById('foodTypeName').value = '';
+                saveData();
+                renderFoodTypesList();
+                renderFoodTypeFilter();
+            }
+        }
+
+        function openEditFoodType(typeName) {
+            const ft = foodTypes.find(f => f.name === typeName);
+            if (!ft) return;
+
+            document.getElementById('editFoodTypeOrigName').value = ft.name;
+            document.getElementById('editFoodTypeName').value = ft.name;
+            tempModalFoodTypeTasks = JSON.parse(JSON.stringify(ft.defaultTasks || []));
+
+            renderPrepCategoriesDropdowns();
+            renderModalFoodTypeTasks();
+            document.getElementById('editFoodTypeModal').classList.add('active');
+        }
+
+        function addPrepTaskToFoodTypeModal() {
+            const categorySelect = document.getElementById('modalFoodTypePrepCat');
+            const category = categorySelect ? categorySelect.value : '';
+            const descInput = document.getElementById('modalFoodTypePrepDesc');
+            const desc = descInput ? descInput.value.trim() : '';
+            const offsetDays = parseInt(document.getElementById('modalFoodTypePrepOffset').value) || 0;
+            const timeOfDay = document.getElementById('modalFoodTypePrepTime').value;
+
+            if (!category) return;
+
+            tempModalFoodTypeTasks.push({ category, desc, offsetDays, timeOfDay });
+            if (descInput) descInput.value = '';
+            renderModalFoodTypeTasks();
+        }
+
+        function removeModalFoodTypeTask(idx) {
+            tempModalFoodTypeTasks.splice(idx, 1);
+            renderModalFoodTypeTasks();
+        }
+
+        function renderModalFoodTypeTasks() {
+            const container = document.getElementById('modalFoodTypeTaskList');
+            if (!container) return;
+            container.innerHTML = '';
+            tempModalFoodTypeTasks.forEach((t, i) => {
+                const descText = t.desc ? `: ${t.desc}` : '';
+                const div = document.createElement('div');
+                div.className = 'task-builder-item';
+                div.innerHTML = `
+                    <strong>${t.category}</strong>${descText} <br><small style="color:var(--text-secondary);">(${t.offsetDays}d prior - ${t.timeOfDay})</small>
+                    <button type="button" class="btn-danger" style="float:right; padding:2px 6px; font-size:0.7rem;" onclick="removeModalFoodTypeTask(${i})">&times;</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function saveFoodTypeEdit() {
+            const origName = document.getElementById('editFoodTypeOrigName').value;
+            const newName = document.getElementById('editFoodTypeName').value.trim();
+
+            const ft = foodTypes.find(f => f.name === origName);
+            if (ft && newName) {
+                ft.name = newName;
+                ft.defaultTasks = [...tempModalFoodTypeTasks];
+
+                meals.forEach(m => {
+                    if (m.foodType === origName) m.foodType = newName;
+                });
+
+                saveData();
+                renderFoodTypesList();
+                renderFoodTypeFilter();
+                renderLibrary();
+                closeModal('editFoodTypeModal');
+            }
+        }
+
+        function deleteFoodType(typeName) {
+            if (confirm(`Delete Food Type "${typeName}"?`)) {
+                foodTypes = foodTypes.filter(f => f.name !== typeName);
+                meals.forEach(m => {
+                    if (m.foodType === typeName) m.foodType = '';
+                });
+                saveData();
+                renderFoodTypesList();
+                renderFoodTypeFilter();
+                renderLibrary();
+            }
+        }
+
+        function renderFoodTypesList() {
+            const container = document.getElementById('foodTypeList');
+            container.innerHTML = '';
+            foodTypes.forEach(ft => {
+                const item = document.createElement('div');
+                item.className = 'tag-item';
+                const taskCount = (ft.defaultTasks || []).length;
+                item.innerHTML = `
+                    <div>
+                        <strong>${ft.name}</strong> 
+                        <span style="color:var(--text-secondary); font-size:0.8rem;">(${taskCount} default prep task${taskCount === 1 ? '' : 's'})</span>
+                    </div>
+                    <div class="tag-actions">
+                        <button type="button" class="btn-secondary" onclick="openEditFoodType('${ft.name}')">Edit</button>
+                        <button type="button" class="btn-danger" onclick="deleteFoodType('${ft.name}')">&times;</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function renderFoodTypeFilter() {
+            const select = document.getElementById('foodTypeFilter');
+            select.innerHTML = '<option value="ALL">All Food Types</option>';
+            foodTypes.forEach(ft => {
+                const opt = document.createElement('option');
+                opt.value = ft.name;
+                opt.textContent = ft.name;
+                select.appendChild(opt);
+            });
+        }
+
+        // --- Meal Categories Management ---
+        function addCategory(e) {
+            e.preventDefault();
+            const name = document.getElementById('categoryName').value.trim();
+            if (name && !categories.includes(name)) {
+                categories.push(name);
+                document.getElementById('categoryName').value = '';
+                saveData();
+                renderMealCategoriesList();
+                renderCategoryFilter();
+            }
+        }
+
+        function openEditMealCategory(oldName) {
+            document.getElementById('editMealCatOldName').value = oldName;
+            document.getElementById('editMealCatNewName').value = oldName;
+            document.getElementById('editMealCatModal').classList.add('active');
+        }
+
+        function saveMealCategoryEdit() {
+            const oldName = document.getElementById('editMealCatOldName').value;
+            const newName = document.getElementById('editMealCatNewName').value.trim();
+
+            if (newName && newName !== oldName) {
+                const index = categories.indexOf(oldName);
+                if (index !== -1) categories[index] = newName;
+
+                meals.forEach(m => {
+                    if (m.categories) {
+                        m.categories = m.categories.map(c => c === oldName ? newName : c);
+                    }
+                });
+
+                saveData();
+                renderMealCategoriesList();
+                renderCategoryFilter();
+                renderLibrary();
+                closeModal('editMealCatModal');
+            }
+        }
+
+        function deleteMealCategory(catName) {
+            if (confirm(`Delete meal category "${catName}"?`)) {
+                categories = categories.filter(c => c !== catName);
+                meals.forEach(m => {
+                    if (m.categories) {
+                        m.categories = m.categories.filter(c => c !== catName);
+                    }
+                });
+                saveData();
+                renderMealCategoriesList();
+                renderCategoryFilter();
+                renderLibrary();
+            }
+        }
+
+        function renderMealCategoriesList() {
+            const container = document.getElementById('mealCategoryList');
+            container.innerHTML = '';
+            categories.forEach(cat => {
+                const item = document.createElement('div');
+                item.className = 'tag-item';
+                item.innerHTML = `
+                    <span><strong>${cat}</strong></span>
+                    <div class="tag-actions">
+                        <button type="button" class="btn-secondary" onclick="openEditMealCategory('${cat}')">Edit</button>
+                        <button type="button" class="btn-danger" onclick="deleteMealCategory('${cat}')">&times;</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function renderCategoryFilter() {
+            const select = document.getElementById('categoryFilter');
+            select.innerHTML = '<option value="ALL">All Meal Categories</option>';
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                select.appendChild(opt);
+            });
+        }
+
+        // --- Prep Categories Management ---
+        function addPrepCategory(e) {
+            e.preventDefault();
+            const name = document.getElementById('prepCatName').value.trim();
+            const defaultOffset = parseInt(document.getElementById('prepCatDefaultOffset').value);
+            const defaultTime = document.getElementById('prepCatDefaultTime').value;
+
+            if (name && !prepCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+                prepCategories.push({ name, defaultOffset, defaultTime });
+                document.getElementById('prepCatName').value = '';
+                saveData();
+                renderPrepCategoriesDropdowns();
+                renderPrepCategoriesTags();
+            }
+        }
+
+        function openEditPrepCategory(name) {
+            const cat = prepCategories.find(c => c.name === name);
+            if (!cat) return;
+            document.getElementById('editPrepCatOriginalName').value = cat.name;
+            document.getElementById('editPrepCatName').value = cat.name;
+            document.getElementById('editPrepCatOffset').value = cat.defaultOffset;
+            document.getElementById('editPrepCatTime').value = cat.defaultTime;
+            document.getElementById('editPrepCatModal').classList.add('active');
+        }
+
+        function savePrepCategoryEdit() {
+            const origName = document.getElementById('editPrepCatOriginalName').value;
+            const newName = document.getElementById('editPrepCatName').value.trim();
+            const offset = parseInt(document.getElementById('editPrepCatOffset').value);
+            const time = document.getElementById('editPrepCatTime').value;
+
+            const cat = prepCategories.find(c => c.name === origName);
+            if (cat && newName) {
+                cat.name = newName;
+                cat.defaultOffset = offset;
+                cat.defaultTime = time;
+
+                meals.forEach(m => {
+                    if (m.tasks) {
+                        m.tasks.forEach(t => {
+                            if (t.category === origName) t.category = newName;
+                        });
+                    }
+                });
+
+                foodTypes.forEach(ft => {
+                    if (ft.defaultTasks) {
+                        ft.defaultTasks.forEach(t => {
+                            if (t.category === origName) t.category = newName;
+                        });
+                    }
+                });
+
+                saveData();
+                renderPrepCategoriesDropdowns();
+                renderPrepCategoriesTags();
+                renderLibrary();
+                closeModal('editPrepCatModal');
+            }
+        }
+
+        function deletePrepCategory(name) {
+            if (confirm(`Delete prep category "${name}"?`)) {
+                prepCategories = prepCategories.filter(c => c.name !== name);
+                saveData();
+                renderPrepCategoriesDropdowns();
+                renderPrepCategoriesTags();
+            }
+        }
+
+        function renderPrepCategoriesDropdowns() {
+            const dropdownIds = ['prepTaskCat', 'modalFoodTypePrepCat'];
+            dropdownIds.forEach(id => {
+                const select = document.getElementById(id);
+                if (!select) return;
+                const currentVal = select.value;
+                select.innerHTML = '';
+                prepCategories.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.name;
+                    opt.textContent = c.name;
+                    select.appendChild(opt);
+                });
+                if (currentVal) select.value = currentVal;
+            });
+            applyPrepCategoryDefaults('prepTaskCat', 'prepTaskOffset', 'prepTaskTime');
+            applyPrepCategoryDefaults('modalFoodTypePrepCat', 'modalFoodTypePrepOffset', 'modalFoodTypePrepTime');
+        }
+
+        function renderPrepCategoriesTags() {
+            const container = document.getElementById('prepCategoryList');
+            container.innerHTML = '';
+            prepCategories.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'tag-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${c.name}</strong> 
+                        <span style="color:var(--text-secondary); font-size:0.8rem;">(${c.defaultOffset}d prior, ${c.defaultTime})</span>
+                    </div>
+                    <div class="tag-actions">
+                        <button type="button" class="btn-secondary" onclick="openEditPrepCategory('${c.name}')">Edit</button>
+                        <button type="button" class="btn-danger" onclick="deletePrepCategory('${c.name}')">&times;</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function applyPrepCategoryDefaults(selectId, offsetId, timeId) {
+            const selectEl = document.getElementById(selectId);
+            if (!selectEl) return;
+            const selectedCatName = selectEl.value;
+            const cat = prepCategories.find(c => c.name === selectedCatName);
+            if (cat) {
+                document.getElementById(offsetId).value = cat.defaultOffset;
+                document.getElementById(timeId).value = cat.defaultTime;
+            }
+        }
+
+        // --- Library Tab ---
+        function renderLibrary() {
+            const grid = document.getElementById('libraryGrid');
+            grid.innerHTML = '';
+            
+            const filterCategory = document.getElementById('categoryFilter').value;
+            const filterFoodType = document.getElementById('foodTypeFilter').value;
+            const searchQuery = document.getElementById('mealSearchInput').value.trim().toLowerCase();
+
+            const filteredMeals = meals.filter(m => {
+                const matchesCategory = (filterCategory === 'ALL') || (m.categories && m.categories.includes(filterCategory));
+                const matchesFoodType = (filterFoodType === 'ALL') || (m.foodType === filterFoodType);
+                
+                let matchesSearch = true;
+                if (searchQuery) {
+                    const nameMatch = m.name.toLowerCase().includes(searchQuery);
+                    const foodTypeMatch = m.foodType && m.foodType.toLowerCase().includes(searchQuery);
+                    const categoryMatch = m.categories && m.categories.some(c => c.toLowerCase().includes(searchQuery));
+                    const taskMatch = m.tasks && m.tasks.some(t => 
+                        (t.desc && t.desc.toLowerCase().includes(searchQuery)) || 
+                        t.category.toLowerCase().includes(searchQuery)
+                    );
+
+                    matchesSearch = nameMatch || foodTypeMatch || categoryMatch || taskMatch;
+                }
+
+                return matchesCategory && matchesFoodType && matchesSearch;
+            });
+
+            if (filteredMeals.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1 / -1; color: var(--text-secondary); font-style: italic;">No meals found matching your criteria.</div>`;
+                return;
+            }
+
+            filteredMeals.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'meal-card-item';
+
+                const foodTypeHtml = m.foodType ? `<span class="food-type-tag">${m.foodType}</span>` : '';
+                const tagsHtml = (m.categories || []).map(c => `<span class="meal-tag">${c}</span>`).join('');
+                const tasksHtml = (m.tasks || []).map(t => {
+                    const detailStr = t.desc ? `: ${t.desc}` : '';
+                    return `<li style="font-size:0.8rem; color:var(--text-secondary);">• ${t.category}${detailStr}</li>`;
+                }).join('');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="meal-card-header">
+                            <span class="meal-card-title" onclick="openMealDetail(${m.id})">${m.name}</span>
+                            <button type="button" class="btn-secondary" style="font-size:0.7rem; padding:2px 8px;" onclick="openMealDetail(${m.id})">Edit</button>
+                        </div>
+                        <div class="meal-card-tags">${foodTypeHtml}${tagsHtml}</div>
+                        <ul style="list-style:none; padding-left:0; margin-top:8px;">${tasksHtml}</ul>
+                    </div>
+
+                    <div class="quick-add-box">
+                        <div class="quick-add-title">Quick Add to Weekly Plan</div>
+                        <div class="quick-add-controls">
+                            <select id="quickDay_${m.id}">
+                                ${days.map(d => `<option value="${d}">${d}</option>`).join('')}
+                            </select>
+                            <select id="quickTime_${m.id}">
+                                ${mealTimes.map(t => `<option value="${t}">${t}</option>`).join('')}
+                            </select>
+                            <button type="button" onclick="quickAddMealToPlanner(${m.id})">+ Add</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function quickAddMealToPlanner(mealId) {
+            const day = document.getElementById(`quickDay_${mealId}`).value;
+            const timeSlot = document.getElementById(`quickTime_${mealId}`).value;
+            const meal = meals.find(m => m.id === mealId);
+
+            if (!meal) return;
+
+            const slotKey = `${day}_${timeSlot}`;
+            weeklyPlan[slotKey] = {
+                text: meal.name,
+                mealId: meal.id
+            };
+
+            saveData();
+            renderPlanner();
+            alert(`Added "${meal.name}" to ${day} ${timeSlot}!`);
+        }
+
+        function createNewMeal() {
+            const newMeal = {
+                id: Date.now(),
+                name: 'New Recipe',
+                foodType: '',
+                categories: [],
+                tasks: []
+            };
+            meals.push(newMeal);
+            saveData();
+            openMealDetail(newMeal.id);
+        }
+
+        // --- Meal Detail & Editor Tab ---
+        function openMealDetail(mealId) {
+            activeMealId = mealId;
+            const meal = meals.find(m => m.id === mealId);
+            if (!meal) return;
+
+            document.getElementById('editMealId').value = meal.id;
+            document.getElementById('editMealName').value = meal.name;
+            document.getElementById('mealDetailTitle').textContent = `Edit Meal: ${meal.name}`;
+
+            const foodTypeSelect = document.getElementById('editMealFoodType');
+            foodTypeSelect.innerHTML = '<option value="">-- None --</option>';
+            foodTypes.forEach(ft => {
+                const opt = document.createElement('option');
+                opt.value = ft.name;
+                opt.textContent = ft.name;
+                if (meal.foodType === ft.name) opt.selected = true;
+                foodTypeSelect.appendChild(opt);
+            });
+
+            const cbContainer = document.getElementById('editCategoryCheckboxes');
+            cbContainer.innerHTML = '';
+            categories.forEach(cat => {
+                const isChecked = (meal.categories || []).includes(cat) ? 'checked' : '';
+                const item = document.createElement('label');
+                item.className = 'checkbox-item';
+                item.innerHTML = `
+                    <input type="checkbox" value="${cat}" id="cat_cb_${cat}" ${isChecked}>
+                    <span>${cat}</span>
+                `;
+                cbContainer.appendChild(item);
+            });
+
+            activeMealTasks = [...(meal.tasks || [])];
+            renderActiveMealTasks();
+
+            const detailBtn = document.getElementById('detailTabBtn');
+            detailBtn.style.display = 'inline-block';
+            switchTab('detailTab', detailBtn);
+        }
+
+        function handleFoodTypeChangeInMeal() {
+            const selectedType = document.getElementById('editMealFoodType').value;
+            
+            if (!selectedType) {
+                activeMealTasks = [];
+            } else {
+                const ft = foodTypes.find(f => f.name === selectedType);
+                if (ft && ft.defaultTasks) {
+                    activeMealTasks = JSON.parse(JSON.stringify(ft.defaultTasks));
+                } else {
+                    activeMealTasks = [];
+                }
+            }
+            renderActiveMealTasks();
+        }
+
+        function addPrepTaskToCurrentMeal() {
+            const categorySelect = document.getElementById('prepTaskCat');
+            const category = categorySelect ? categorySelect.value : '';
+            const desc = document.getElementById('prepTaskDesc').value.trim();
+            const offsetDays = parseInt(document.getElementById('prepTaskOffset').value) || 0;
+            const timeOfDay = document.getElementById('prepTaskTime').value;
+
+            if (!category) return;
+
+            activeMealTasks.push({ category, desc, offsetDays, timeOfDay });
+            document.getElementById('prepTaskDesc').value = '';
+            renderActiveMealTasks();
+        }
+
+        function removeActiveMealTask(index) {
+            activeMealTasks.splice(index, 1);
+            renderActiveMealTasks();
+        }
+
+        function renderActiveMealTasks() {
+            const container = document.getElementById('editTempTaskList');
+            container.innerHTML = '';
+            activeMealTasks.forEach((t, i) => {
+                const offsetLabel = t.offsetDays === 0 ? 'Same Day' : `${t.offsetDays} Day(s) Before`;
+                const descText = t.desc ? `: ${t.desc}` : '';
+                const div = document.createElement('div');
+                div.className = 'task-builder-item';
+                div.innerHTML = `
+                    <strong>${t.category}</strong>${descText} 
+                    <br><small style="color:var(--text-secondary);">(${offsetLabel} - ${t.timeOfDay})</small>
+                    <button type="button" class="btn-danger" style="float:right; padding:2px 6px; font-size:0.7rem;" onclick="removeActiveMealTask(${i})">&times;</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function saveMealDetails(e) {
+            e.preventDefault();
+            const meal = meals.find(m => m.id === activeMealId);
+            if (!meal) return;
+
+            meal.name = document.getElementById('editMealName').value.trim();
+            meal.foodType = document.getElementById('editMealFoodType').value;
+
+            const selectedCats = [];
+            categories.forEach(cat => {
+                const cb = document.getElementById(`cat_cb_${cat}`);
+                if (cb && cb.checked) selectedCats.push(cat);
+            });
+            meal.categories = selectedCats;
+            meal.tasks = [...activeMealTasks];
+
+            saveData();
+            renderLibrary();
+            renderPlanner();
+            alert('Meal details updated!');
+        }
+
+        function deleteCurrentMeal() {
+            if (confirm('Are you sure you want to delete this meal?')) {
+                meals = meals.filter(m => m.id !== activeMealId);
+                saveData();
+                renderLibrary();
+                renderPlanner();
+                document.getElementById('detailTabBtn').style.display = 'none';
+                switchTab('libraryTab', document.querySelectorAll('.nav-tab')[1]);
+            }
+        }
+
+        function scheduleCurrentMealToPlanner() {
+            const day = document.getElementById('assignDaySelect').value;
+            const timeSlot = document.getElementById('assignTimeSelect').value;
+            const meal = meals.find(m => m.id === activeMealId);
+
+            if (!meal) return;
+
+            const slotKey = `${day}_${timeSlot}`;
+            weeklyPlan[slotKey] = {
+                text: meal.name,
+                mealId: meal.id
+            };
+
+            saveData();
+            renderPlanner();
+            alert(`Assigned "${meal.name}" to ${day} ${timeSlot}!`);
+        }
+
+        // --- Weekly Planner ---
+        function renderPlanner() {
+            const tbody = document.getElementById('plannerGrid');
+            tbody.innerHTML = '';
+
+            mealTimes.forEach(time => {
+                const tr = document.createElement('tr');
+
+                days.forEach(day => {
+                    const td = document.createElement('td');
+                    const slotKey = `${day}_${time}`;
+                    
+                    if (!weeklyPlan[slotKey]) {
+                        weeklyPlan[slotKey] = { text: '', mealId: '' };
+                    }
+                    const slotData = weeklyPlan[slotKey];
+
+                    td.innerHTML = `
+                        <div class="meal-slot">
+                            <div class="slot-header">${time}</div>
+                            <div class="slot-content" 
+                                 contenteditable="true" 
+                                 onblur="updateSlotText('${slotKey}', this.innerText)"
+                                 placeholder="Type or select...">${slotData.text}</div>
+                        </div>
+                        <select class="assign-select no-print" onchange="assignMealToSlot('${slotKey}', this.value)">
+                            <option value="">-- Select Meal --</option>
+                            ${meals.map(m => `<option value="${m.id}" ${slotData.mealId == m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
+                        </select>
+                    `;
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateSlotText(slotKey, text) {
+            weeklyPlan[slotKey].text = text.trim();
+            saveData();
+        }
+
+        function assignMealToSlot(slotKey, mealId) {
+            const selectedMeal = meals.find(m => m.id == mealId);
+            if (selectedMeal) {
+                weeklyPlan[slotKey] = { text: selectedMeal.name, mealId: selectedMeal.id };
+            } else {
+                weeklyPlan[slotKey] = { text: '', mealId: '' };
+            }
+            saveData();
+            renderPlanner();
+        }
+
+        function clearWeeklyPlan() {
+            if (confirm('Clear all scheduled meals for the week?')) {
+                weeklyPlan = {};
+                saveData();
+                renderPlanner();
+            }
+        }
+
+        // --- Prep Schedule Aggregation ---
+        function renderPrepSchedule() {
+            const container = document.getElementById('prepGridContainer');
+            container.innerHTML = '';
+
+            const dailySchedule = {};
+            days.forEach(day => {
+                dailySchedule[day] = { Morning: [], Afternoon: [], Night: [] };
+            });
+
+            Object.keys(weeklyPlan).forEach(slotKey => {
+                const slot = weeklyPlan[slotKey];
+                if (!slot.mealId) return;
+
+                const meal = meals.find(m => m.id == slot.mealId);
+                if (!meal || !meal.tasks) return;
+
+                const [mealDay, mealTimeSlot] = slotKey.split('_');
+                const mealDayIndex = days.indexOf(mealDay);
+
+                meal.tasks.forEach(task => {
+                    let targetDayIndex = mealDayIndex - task.offsetDays;
+                    if (targetDayIndex < 0) targetDayIndex += 7;
+
+                    const targetDay = days[targetDayIndex];
+                    const targetTime = task.timeOfDay;
+
+                    if (dailySchedule[targetDay] && dailySchedule[targetDay][targetTime]) {
+                        dailySchedule[targetDay][targetTime].push({
+                            mealName: meal.name,
+                            forDay: mealDay,
+                            forTime: mealTimeSlot,
+                            taskDesc: task.desc,
+                            category: task.category
+                        });
+                    }
+                });
+            });
+
+            days.forEach(day => {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'prep-day-card';
+
+                let dayContentHtml = `<div class="prep-day-header">${day}</div>`;
+
+                ['Morning', 'Afternoon', 'Night'].forEach(timeSlot => {
+                    const tasks = dailySchedule[day][timeSlot];
+                    dayContentHtml += `
+                        <div class="prep-time-section">
+                            <div class="prep-time-title">${timeSlot}</div>
+                            <ul class="prep-task-list">
+                                ${tasks.length === 0 ? '<li style="color:var(--text-secondary); font-size:0.75rem;">No tasks</li>' : ''}
+                                ${tasks.map(t => {
+                                    const detailStr = t.taskDesc ? `: ${t.taskDesc}` : '';
+                                    return `
+                                        <li class="prep-task-item">
+                                            <strong>${t.category}</strong>${detailStr}
+                                            <br><span style="color:var(--text-secondary); font-size:0.75rem;">(For ${t.forDay} ${t.forTime} - ${t.mealName})</span>
+                                        </li>
+                                    `;
+                                }).join('')}
+                            </ul>
+                        </div>
+                    `;
+                });
+
+                dayCard.innerHTML = dayContentHtml;
+                container.appendChild(dayCard);
+            });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
